@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
 
@@ -7,8 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-<title>AR Video Debug</title>
+<title>AR Video Test</title>
 
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -27,20 +26,20 @@ body{
 #debug{
 
     position:fixed;
-    z-index:999;
-
     left:10px;
     bottom:10px;
 
-    background:rgba(0,0,0,.75);
+    z-index:999;
+
+    background:rgba(0,0,0,.7);
 
     color:white;
 
-    padding:10px;
+    padding:12px;
 
-    font-size:13px;
+    font-size:14px;
 
-    line-height:20px;
+    line-height:22px;
 
 }
 
@@ -48,7 +47,6 @@ body{
 
 
 </head>
-
 
 
 <body>
@@ -66,6 +64,7 @@ body{
 mindar-image="
 imageTargetSrc: ./targets.mind;
 autoStart:true;
+uiScanning:yes;
 "
 
 
@@ -85,7 +84,6 @@ vr-mode-ui="enabled:false"
 device-orientation-permission-ui="enabled:false"
 
 
-
 >
 
 
@@ -102,13 +100,15 @@ loop
 
 muted
 
+autoplay
+
 playsinline
 
 webkit-playsinline
 
-crossorigin="anonymous"
+crossorigin="anonymous">
 
-></video>
+</video>
 
 
 </a-assets>
@@ -117,11 +117,9 @@ crossorigin="anonymous"
 
 
 <a-camera
-
 position="0 0 0">
 
 </a-camera>
-
 
 
 
@@ -132,24 +130,23 @@ id="target"
 mindar-image-target="targetIndex:0">
 
 
-<a-plane
+<a-video
 
-id="screen"
+id="videoPlane"
+
+src="#video"
 
 position="0 0 0"
 
 rotation="0 0 0"
 
-width="2.4"
+width="2.8"
 
-height="1.8"
+height="2.1"
 
-material="
-shader:flat;
-side:double;
-">
+>
 
-</a-plane>
+</a-video>
 
 
 </a-entity>
@@ -168,10 +165,6 @@ const video =
 document.querySelector("#video");
 
 
-const screen =
-document.querySelector("#screen");
-
-
 const target =
 document.querySelector("#target");
 
@@ -181,118 +174,88 @@ document.querySelector("#debug");
 
 
 
-// 创建视频纹理
+// 页面加载立即播放
 
-const texture =
-new THREE.VideoTexture(video);
+window.onload=()=>{
+
+video.play()
+.then(()=>{
+
+console.log("video playing");
+
+})
+.catch(e=>{
+
+console.log(e);
+
+});
+
+};
 
 
-texture.minFilter =
-THREE.LinearFilter;
 
 
-texture.magFilter =
-THREE.LinearFilter;
+// 点击强制播放
+
+document.body.onclick=()=>{
+
+video.play();
+
+};
 
 
 
-// 绑定纹理
 
-screen.addEventListener(
-"loaded",
+// AR识别
+
+target.addEventListener(
+"targetFound",
 ()=>{
 
-const mesh =
-screen.getObject3D("mesh");
+debug.innerHTML += "<br>识别成功";
 
 
-if(mesh){
+video.play();
 
-mesh.material.map =
-texture;
-
-mesh.material.needsUpdate=true;
-
-}
 
 });
 
 
 
+target.addEventListener(
+"targetLost",
+()=>{
 
-// 调试信息
+debug.innerHTML += "<br>丢失";
+
+});
+
+
+
+// 调试
 
 setInterval(()=>{
 
-debug.innerHTML =
+
+debug.innerHTML=
 
 `
-readyState: ${video.readyState}<br>
-paused: ${video.paused}<br>
-currentTime: ${video.currentTime.toFixed(2)}<br>
-duration: ${video.duration ? video.duration.toFixed(2) : 0}<br>
-loop: ${video.loop}
+readyState:${video.readyState}<br>
+
+paused:${video.paused}<br>
+
+time:${video.currentTime.toFixed(2)}<br>
+
+duration:${video.duration ? video.duration.toFixed(2):0}
+
 `;
+
 
 },500);
 
 
-
-
-// 识别成功
-
-target.addEventListener(
-
-"targetFound",
-
-()=>{
-
-
-video.currentTime=0;
-
-
-video.play();
-
-
-});
-
-
-
-
-// 丢失暂停
-
-target.addEventListener(
-
-"targetLost",
-
-()=>{
-
-
-video.pause();
-
-
-});
-
-
-
-
-// 点击屏幕强制播放
-
-document.body.addEventListener(
-
-"click",
-
-()=>{
-
-
-video.play();
-
-
-});
-
-
-
 </script>
+
 
 
 </body>
