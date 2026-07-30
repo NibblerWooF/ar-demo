@@ -7,6 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <title>AR Video Debug</title>
 
 
@@ -54,9 +55,7 @@ body{
 
 
 <div id="debug">
-
-等待加载...
-
+加载中...
 </div>
 
 
@@ -76,6 +75,7 @@ embedded
 renderer="
 alpha:true;
 antialias:true;
+colorManagement:true;
 "
 
 
@@ -106,19 +106,22 @@ playsinline
 
 webkit-playsinline
 
-crossorigin="anonymous">
+crossorigin="anonymous"
 
-</video>
+></video>
 
 
 </a-assets>
 
 
 
+
 <a-camera
+
 position="0 0 0">
 
 </a-camera>
+
 
 
 
@@ -131,7 +134,7 @@ mindar-image-target="targetIndex:0">
 
 <a-plane
 
-id="plane"
+id="screen"
 
 position="0 0 0"
 
@@ -165,8 +168,8 @@ const video =
 document.querySelector("#video");
 
 
-const plane =
-document.querySelector("#plane");
+const screen =
+document.querySelector("#screen");
 
 
 const target =
@@ -178,7 +181,7 @@ document.querySelector("#debug");
 
 
 
-// 视频纹理
+// 创建视频纹理
 
 const texture =
 new THREE.VideoTexture(video);
@@ -187,38 +190,20 @@ new THREE.VideoTexture(video);
 texture.minFilter =
 THREE.LinearFilter;
 
+
 texture.magFilter =
 THREE.LinearFilter;
 
 
 
-function updateDebug(){
+// 绑定纹理
 
-debug.innerHTML =
-`
-readyState: ${video.readyState}<br>
-paused: ${video.paused}<br>
-currentTime: ${video.currentTime.toFixed(2)}<br>
-duration: ${isNaN(video.duration) ? "加载中" : video.duration.toFixed(2)}<br>
-networkState: ${video.networkState}
-`;
-
-}
-
-
-setInterval(updateDebug,500);
-
-
-
-// 等模型生成
-
-plane.addEventListener(
+screen.addEventListener(
 "loaded",
 ()=>{
 
-
 const mesh =
-plane.getObject3D("mesh");
+screen.getObject3D("mesh");
 
 
 if(mesh){
@@ -230,68 +215,84 @@ mesh.material.needsUpdate=true;
 
 }
 
-
 });
 
 
 
 
+// 调试信息
+
+setInterval(()=>{
+
+debug.innerHTML =
+
+`
+readyState: ${video.readyState}<br>
+paused: ${video.paused}<br>
+currentTime: ${video.currentTime.toFixed(2)}<br>
+duration: ${video.duration ? video.duration.toFixed(2) : 0}<br>
+loop: ${video.loop}
+`;
+
+},500);
+
+
+
+
+// 识别成功
 
 target.addEventListener(
+
 "targetFound",
+
 ()=>{
-
-
-debug.innerHTML += "<br>识别成功";
-
 
 
 video.currentTime=0;
 
 
-video.play()
-.then(()=>{
-
-console.log("播放成功");
-
-})
-.catch(err=>{
-
-console.log(err);
-
-});
-
+video.play();
 
 
 });
 
 
 
+
+// 丢失暂停
 
 target.addEventListener(
+
 "targetLost",
+
 ()=>{
+
 
 video.pause();
 
+
 });
 
 
 
-// 点击解除手机限制
+
+// 点击屏幕强制播放
 
 document.body.addEventListener(
+
 "click",
+
 ()=>{
 
+
 video.play();
+
 
 });
 
 
 
 </script>
-
 
 
 </body>
