@@ -9,61 +9,85 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
 <title>AR Demo</title>
 
+
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+
 <style>
+
 html,
 body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:transparent;
+
 }
 
+
 #tip {
-    position: fixed;
-    z-index: 10;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.6);
-    color: white;
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-size: 14px;
+
+    position:fixed;
+    z-index:10;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+
+    padding:10px 18px;
+
+    background:rgba(0,0,0,0.6);
+
+    color:white;
+
+    border-radius:20px;
+
+    font-size:14px;
+
 }
+
 </style>
 
 </head>
 
 
+
 <body>
+
 
 <div id="tip">
 请对准识别图片
 </div>
 
 
+
 <a-scene
+
 
 mindar-image="
 imageTargetSrc: ./targets.mind;
 autoStart: true;
-uiScanning: yes;
 "
 
-color-space="sRGB"
+
+embedded
+
 
 renderer="
-colorManagement: true;
-antialias: true;
+alpha:true;
+colorManagement:true;
+antialias:true;
 "
+
 
 vr-mode-ui="enabled:false"
 
+
 device-orientation-permission-ui="enabled:false"
+
 
 >
 
@@ -75,64 +99,81 @@ id="ar-image"
 src="./200.webp"
 crossorigin="anonymous">
 
+
 </a-assets>
 
 
+
 <a-camera
+
 position="0 0 0"
+
 look-controls="enabled:false">
+
 </a-camera>
 
 
 
+
 <a-entity
+
 id="target"
+
 mindar-image-target="targetIndex:0">
 
 
 <a-image
 
+
 src="#ar-image"
+
 
 position="0 0 0"
 
+
 rotation="-90 0 0"
+
 
 width="0.9"
 
+
 height="0.9"
 
-material="
-transparent:true;
-alphaTest:0.01;
-"
 
->
-</a-image>
+transparent="true"
+
+
+></a-image>
 
 
 </a-entity>
+
+
 
 
 </a-scene>
 
 
 
+
 <script>
+
 
 const target =
 document.querySelector("#target");
+
 
 const tip =
 document.querySelector("#tip");
 
 
-// 识别成功
+
 target.addEventListener(
 "targetFound",
 ()=>{
 
 tip.innerHTML="识别成功";
+
 
 setTimeout(()=>{
 
@@ -140,10 +181,10 @@ tip.style.display="none";
 
 },1000);
 
+
 });
 
 
-// 丢失识别
 
 target.addEventListener(
 "targetLost",
@@ -157,6 +198,7 @@ tip.innerHTML="请重新对准图片";
 
 
 </script>
+
 
 
 </body>
