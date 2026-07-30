@@ -5,9 +5,10 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-<title>AR Video Test</title>
+
+<title>AR Video Demo</title>
 
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -17,29 +18,35 @@
 
 <style>
 
-body{
+html,body{
+
     margin:0;
+    width:100%;
+    height:100%;
     overflow:hidden;
+
 }
 
 
-#debug{
+#tip{
 
     position:fixed;
-    left:10px;
-    bottom:10px;
+    z-index:10;
 
-    z-index:999;
+    bottom:30px;
+    left:50%;
 
-    background:rgba(0,0,0,.7);
+    transform:translateX(-50%);
+
+    background:rgba(0,0,0,.6);
 
     color:white;
 
-    padding:12px;
+    padding:10px 20px;
+
+    border-radius:20px;
 
     font-size:14px;
-
-    line-height:22px;
 
 }
 
@@ -49,11 +56,14 @@ body{
 </head>
 
 
+
 <body>
 
 
-<div id="debug">
-加载中...
+<div id="tip">
+
+请对准识别图片
+
 </div>
 
 
@@ -62,19 +72,25 @@ body{
 
 
 mindar-image="
+
 imageTargetSrc: ./targets.mind;
-autoStart:true;
-uiScanning:yes;
+
+autoStart: true;
+
+uiScanning: yes;
+
 "
 
 
-embedded
+color-space="sRGB"
 
 
 renderer="
-alpha:true;
-antialias:true;
-colorManagement:true;
+
+colorManagement: true;
+
+antialias: true;
+
 "
 
 
@@ -87,6 +103,7 @@ device-orientation-permission-ui="enabled:false"
 >
 
 
+
 <a-assets>
 
 
@@ -96,11 +113,11 @@ id="video"
 
 src="./200.mp4"
 
+autoplay
+
 loop
 
 muted
-
-autoplay
 
 playsinline
 
@@ -117,9 +134,13 @@ crossorigin="anonymous">
 
 
 <a-camera
-position="0 0 0">
+
+position="0 0 0"
+
+look-controls="enabled:false">
 
 </a-camera>
+
 
 
 
@@ -132,13 +153,11 @@ mindar-image-target="targetIndex:0">
 
 <a-video
 
-id="videoPlane"
-
 src="#video"
 
 position="0 0 0"
 
-rotation="0 0 0"
+rotation="-90 0 0"
 
 width="2.8"
 
@@ -147,6 +166,7 @@ height="2.1"
 >
 
 </a-video>
+
 
 
 </a-entity>
@@ -161,58 +181,43 @@ height="2.1"
 <script>
 
 
-const video =
-document.querySelector("#video");
-
-
 const target =
 document.querySelector("#target");
 
 
-const debug =
-document.querySelector("#debug");
+const video =
+document.querySelector("#video");
+
+
+const tip =
+document.querySelector("#tip");
 
 
 
-// 页面加载立即播放
+// 点击解除手机播放限制
 
-window.onload=()=>{
-
-video.play()
-.then(()=>{
-
-console.log("video playing");
-
-})
-.catch(e=>{
-
-console.log(e);
-
-});
-
-};
-
-
-
-
-// 点击强制播放
-
-document.body.onclick=()=>{
+document.body.addEventListener(
+"click",
+()=>{
 
 video.play();
 
-};
+});
 
 
 
-
-// AR识别
+// 识别成功
 
 target.addEventListener(
+
 "targetFound",
+
 ()=>{
 
-debug.innerHTML += "<br>识别成功";
+tip.innerHTML="识别成功";
+
+
+video.currentTime=0;
 
 
 video.play();
@@ -222,36 +227,20 @@ video.play();
 
 
 
+// 丢失
+
 target.addEventListener(
+
 "targetLost",
+
 ()=>{
 
-debug.innerHTML += "<br>丢失";
+tip.innerHTML="请重新对准图片";
+
+
+video.pause();
 
 });
-
-
-
-// 调试
-
-setInterval(()=>{
-
-
-debug.innerHTML=
-
-`
-readyState:${video.readyState}<br>
-
-paused:${video.paused}<br>
-
-time:${video.currentTime.toFixed(2)}<br>
-
-duration:${video.duration ? video.duration.toFixed(2):0}
-
-`;
-
-
-},500);
 
 
 </script>
