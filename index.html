@@ -1,242 +1,175 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 
 <head>
-
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AR Video Demo</title>
-
+<title>AR Video</title>
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-
 <style>
-
-html,body{
+body{
     margin:0;
-    width:100%;
-    height:100%;
     overflow:hidden;
 }
 
-
 #tip{
-
     position:fixed;
-
     z-index:10;
-
     bottom:30px;
-
     left:50%;
-
     transform:translateX(-50%);
-
-    background:rgba(0,0,0,0.6);
-
     color:white;
-
+    background:#0008;
     padding:10px 20px;
-
     border-radius:20px;
-
-    font-size:14px;
-
 }
-
 </style>
-
 
 </head>
 
 
-
 <body>
 
-
 <div id="tip">
-点击屏幕，然后对准图片
+等待识别
 </div>
-
 
 
 <a-scene
 
-
 mindar-image="
 imageTargetSrc: ./targets.mind;
-autoStart: true;
-uiScanning: yes;
+autoStart:true;
 "
 
-
 embedded
-
 
 renderer="
 alpha:true;
 antialias:true;
-colorManagement:true;
 "
 
-
-vr-mode-ui="enabled:false"
-
-
-device-orientation-permission-ui="enabled:false"
-
-
->
+vr-mode-ui="enabled:false">
 
 
 <a-assets>
 
-
 <video
-
-id="ar-video"
-
+id="video"
 src="./200.mp4"
-
 loop
-
 muted
-
 playsinline
-
 webkit-playsinline
-
-crossorigin="anonymous"
-
-></video>
-
+crossorigin="anonymous">
+</video>
 
 </a-assets>
 
 
-
-
 <a-camera
-
-position="0 0 0"
-
-look-controls="enabled:false">
-
+position="0 0 0">
 </a-camera>
 
 
-
-
 <a-entity
-
 id="target"
-
 mindar-image-target="targetIndex:0">
 
 
-<a-video
-
-id="video-plane"
-
-src="#ar-video"
-
+<a-plane
+id="plane"
 position="0 0 0"
-
-rotation="-90 0 0"
-
+rotation="0 0 0"
 width="2.4"
-
-height="1.8"
-
-></a-video>
-
+height="1.8">
+</a-plane>
 
 
 </a-entity>
-
-
 
 
 </a-scene>
 
 
 
-
-
 <script>
 
 
-const target =
-document.querySelector("#target");
-
-
-const video =
-document.querySelector("#ar-video");
-
-
-const tip =
-document.querySelector("#tip");
+const video=document.querySelector("#video");
+const plane=document.querySelector("#plane");
+const target=document.querySelector("#target");
+const tip=document.querySelector("#tip");
 
 
 
-// 点击屏幕解除手机播放限制
+const texture=new THREE.VideoTexture(video);
+
+texture.minFilter=THREE.LinearFilter;
+texture.magFilter=THREE.LinearFilter;
+
+
+
+target.addEventListener(
+"targetFound",
+()=>{
+
+tip.innerHTML="识别成功";
+
+
+video.play();
+
+
+setTimeout(()=>{
+
+
+const mesh =
+plane.getObject3D("mesh");
+
+
+if(mesh){
+
+mesh.material.map=texture;
+mesh.material.needsUpdate=true;
+
+}
+
+
+},300);
+
+
+});
+
+
+
+target.addEventListener(
+"targetLost",
+()=>{
+
+tip.innerHTML="重新识别";
+
+video.pause();
+
+});
+
+
 
 document.body.addEventListener(
 "click",
 ()=>{
 
-    video.play();
+video.play();
 
 });
 
-
-
-
-// 识别成功
-
-target.addEventListener(
-
-"targetFound",
-
-()=>{
-
-    tip.innerHTML="识别成功";
-
-
-    video.currentTime=0;
-
-
-    video.play();
-
-
-});
-
-
-
-
-// 丢失目标
-
-target.addEventListener(
-
-"targetLost",
-
-()=>{
-
-    tip.innerHTML="请重新对准图片";
-
-
-    video.pause();
-
-});
 
 
 </script>
-
 
 
 </body>
