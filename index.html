@@ -19,39 +19,32 @@
 <style>
 
 html,body{
-
-margin:0;
-
-width:100%;
-
-height:100%;
-
-overflow:hidden;
-
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
 }
 
 
 #tip{
 
-position:fixed;
+    position:fixed;
+    z-index:10;
 
-z-index:10;
+    bottom:30px;
+    left:50%;
 
-bottom:30px;
+    transform:translateX(-50%);
 
-left:50%;
+    background:rgba(0,0,0,.6);
 
-transform:translateX(-50%);
+    color:white;
 
-background:rgba(0,0,0,.6);
+    padding:10px 20px;
 
-color:white;
+    border-radius:20px;
 
-padding:10px 20px;
-
-border-radius:20px;
-
-font-size:14px;
+    font-size:14px;
 
 }
 
@@ -65,11 +58,8 @@ font-size:14px;
 
 
 <div id="tip">
-
 正在启动AR...
-
 </div>
-
 
 
 
@@ -104,6 +94,7 @@ device-orientation-permission-ui="enabled:false"
 
 
 >
+
 
 
 <a-assets>
@@ -151,28 +142,33 @@ id="target"
 mindar-image-target="targetIndex:0">
 
 
-<a-video
+<a-plane
 
-src="#video"
+id="video-plane"
 
 position="0 0 0"
 
-rotation="-90 0 0"
+rotation="90 0 0"
 
-scale="1 -1 1"
+width="11.2"
 
-width="22.4"
+height="8.4"
 
-height="16.8"
+material="
 
->
+shader:flat;
 
-</a-video>
+src:#video;
+
+side:double;
+
+">
+
+</a-plane>
 
 
 
 </a-entity>
-
 
 
 
@@ -192,8 +188,54 @@ const video =
 document.querySelector("#video");
 
 
+const plane =
+document.querySelector("#video-plane");
+
+
 const tip =
 document.querySelector("#tip");
+
+
+
+
+// 视频纹理翻转
+
+plane.addEventListener(
+"loaded",
+()=>{
+
+
+const mesh =
+plane.getObject3D("mesh");
+
+
+if(mesh){
+
+
+const texture =
+mesh.material.map;
+
+
+if(texture){
+
+
+texture.repeat.y = -1;
+
+texture.offset.y = 1;
+
+
+texture.needsUpdate = true;
+
+
+}
+
+
+}
+
+
+});
+
+
 
 
 
@@ -214,7 +256,8 @@ tip.innerHTML="请对准识别图";
 
 
 
-// 识别播放
+
+// 识别成功
 
 target.addEventListener(
 
@@ -235,6 +278,7 @@ video.play();
 }
 
 );
+
 
 
 
