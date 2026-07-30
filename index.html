@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+
+  <title>AR Demo</title>
+
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #tip {
+      position: fixed;
+      z-index: 10;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      font-size: 14px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="tip">请允许使用摄像头，并对准识别图</div>
+
+  <a-scene
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiScanning: yes; uiLoading: yes; uiError: yes;"
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    embedded
+  >
+    <a-assets timeout="10000">
+      <img
+        id="ar-image"
+        src="./200.webp"
+        crossorigin="anonymous"
+      />
+    </a-assets>
+
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false"
+    ></a-camera>
+
+    <a-entity
+      id="target"
+      mindar-image-target="targetIndex: 0"
+    >
+      <a-image
+        src="#ar-image"
+        position="0 0 0"
+        width="0.9"
+        height="0.9"
+      ></a-image>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const target = document.querySelector("#target");
+    const tip = document.querySelector("#tip");
+
+    target.addEventListener("targetFound", () => {
+      tip.textContent = "识别成功";
+      setTimeout(() => {
+        tip.style.display = "none";
+      }, 1000);
+    });
+
+    target.addEventListener("targetLost", () => {
+      tip.style.display = "block";
+      tip.textContent = "请重新对准识别图";
+    });
+  </script>
+</body>
+</html>
