@@ -2,130 +2,219 @@
 <html>
 
 <head>
+
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AR Video</title>
+<title>AR Video Debug</title>
+
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+
 <style>
+
 body{
     margin:0;
     overflow:hidden;
 }
 
-#tip{
+
+#debug{
+
     position:fixed;
-    z-index:10;
-    bottom:30px;
-    left:50%;
-    transform:translateX(-50%);
+    z-index:999;
+
+    left:10px;
+    bottom:10px;
+
+    background:rgba(0,0,0,.75);
+
     color:white;
-    background:#0008;
-    padding:10px 20px;
-    border-radius:20px;
+
+    padding:10px;
+
+    font-size:13px;
+
+    line-height:20px;
+
 }
+
 </style>
+
 
 </head>
 
 
+
 <body>
 
-<div id="tip">
-等待识别
+
+<div id="debug">
+
+等待加载...
+
 </div>
 
 
+
 <a-scene
+
 
 mindar-image="
 imageTargetSrc: ./targets.mind;
 autoStart:true;
 "
 
+
 embedded
+
 
 renderer="
 alpha:true;
 antialias:true;
 "
 
-vr-mode-ui="enabled:false">
+
+vr-mode-ui="enabled:false"
+
+
+device-orientation-permission-ui="enabled:false"
+
+
+
+>
 
 
 <a-assets>
 
+
 <video
+
 id="video"
+
 src="./200.mp4"
+
 loop
+
 muted
+
 playsinline
+
 webkit-playsinline
+
 crossorigin="anonymous">
+
 </video>
+
 
 </a-assets>
 
 
+
 <a-camera
 position="0 0 0">
+
 </a-camera>
 
 
+
 <a-entity
+
 id="target"
+
 mindar-image-target="targetIndex:0">
 
 
 <a-plane
+
 id="plane"
+
 position="0 0 0"
+
 rotation="0 0 0"
+
 width="2.4"
-height="1.8">
+
+height="1.8"
+
+material="
+shader:flat;
+side:double;
+">
+
 </a-plane>
 
 
 </a-entity>
 
 
+
 </a-scene>
+
 
 
 
 <script>
 
 
-const video=document.querySelector("#video");
-const plane=document.querySelector("#plane");
-const target=document.querySelector("#target");
-const tip=document.querySelector("#tip");
+const video =
+document.querySelector("#video");
+
+
+const plane =
+document.querySelector("#plane");
+
+
+const target =
+document.querySelector("#target");
+
+
+const debug =
+document.querySelector("#debug");
 
 
 
-const texture=new THREE.VideoTexture(video);
+// 视频纹理
 
-texture.minFilter=THREE.LinearFilter;
-texture.magFilter=THREE.LinearFilter;
+const texture =
+new THREE.VideoTexture(video);
+
+
+texture.minFilter =
+THREE.LinearFilter;
+
+texture.magFilter =
+THREE.LinearFilter;
 
 
 
-target.addEventListener(
-"targetFound",
+function updateDebug(){
+
+debug.innerHTML =
+`
+readyState: ${video.readyState}<br>
+paused: ${video.paused}<br>
+currentTime: ${video.currentTime.toFixed(2)}<br>
+duration: ${isNaN(video.duration) ? "加载中" : video.duration.toFixed(2)}<br>
+networkState: ${video.networkState}
+`;
+
+}
+
+
+setInterval(updateDebug,500);
+
+
+
+// 等模型生成
+
+plane.addEventListener(
+"loaded",
 ()=>{
-
-tip.innerHTML="识别成功";
-
-
-video.play();
-
-
-setTimeout(()=>{
 
 
 const mesh =
@@ -134,16 +223,48 @@ plane.getObject3D("mesh");
 
 if(mesh){
 
-mesh.material.map=texture;
+mesh.material.map =
+texture;
+
 mesh.material.needsUpdate=true;
 
 }
 
 
-},300);
+});
+
+
+
+
+
+target.addEventListener(
+"targetFound",
+()=>{
+
+
+debug.innerHTML += "<br>识别成功";
+
+
+
+video.currentTime=0;
+
+
+video.play()
+.then(()=>{
+
+console.log("播放成功");
+
+})
+.catch(err=>{
+
+console.log(err);
+
+});
+
 
 
 });
+
 
 
 
@@ -151,13 +272,13 @@ target.addEventListener(
 "targetLost",
 ()=>{
 
-tip.innerHTML="重新识别";
-
 video.pause();
 
 });
 
 
+
+// 点击解除手机限制
 
 document.body.addEventListener(
 "click",
@@ -170,6 +291,7 @@ video.play();
 
 
 </script>
+
 
 
 </body>
