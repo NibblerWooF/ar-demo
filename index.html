@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-<title>AR Demo</title>
+<title>AR Video Demo</title>
 
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -19,19 +19,26 @@
 <style>
 
 html,body{
+
 margin:0;
+
 width:100%;
+
 height:100%;
+
 overflow:hidden;
+
 }
 
 
 #tip{
 
 position:fixed;
+
 z-index:10;
 
 bottom:30px;
+
 left:50%;
 
 transform:translateX(-50%);
@@ -43,6 +50,8 @@ color:white;
 padding:10px 20px;
 
 border-radius:20px;
+
+font-size:14px;
 
 }
 
@@ -56,8 +65,11 @@ border-radius:20px;
 
 
 <div id="tip">
+
 正在启动AR...
+
 </div>
+
 
 
 
@@ -68,7 +80,7 @@ mindar-image="
 
 imageTargetSrc: ./targets.mind;
 
-autoStart: true;
+autoStart:true;
 
 "
 
@@ -94,6 +106,33 @@ device-orientation-permission-ui="enabled:false"
 >
 
 
+<a-assets>
+
+
+<video
+
+id="video"
+
+src="./200.mp4"
+
+loop
+
+muted
+
+playsinline
+
+webkit-playsinline
+
+crossorigin="anonymous">
+
+</video>
+
+
+</a-assets>
+
+
+
+
 <a-camera
 
 position="0 0 0"
@@ -103,13 +142,36 @@ look-controls="enabled:false">
 </a-camera>
 
 
+
+
 <a-entity
 
 id="target"
 
 mindar-image-target="targetIndex:0">
 
+
+<a-video
+
+src="#video"
+
+position="0 0 0"
+
+rotation="-90 0 0"
+
+width="2.8"
+
+height="2.1"
+
+>
+
+</a-video>
+
+
+
 </a-entity>
+
+
 
 
 </a-scene>
@@ -124,39 +186,90 @@ const target =
 document.querySelector("#target");
 
 
+const video =
+document.querySelector("#video");
+
+
 const tip =
 document.querySelector("#tip");
 
 
 
+// AR启动
+
 document.querySelector("a-scene")
 .addEventListener(
+
 "arReady",
+
 ()=>{
 
-tip.innerHTML="AR启动成功";
+tip.innerHTML="请对准识别图";
 
-});
+}
+
+);
 
 
+
+// 识别成功播放
 
 target.addEventListener(
+
 "targetFound",
+
 ()=>{
+
 
 tip.innerHTML="识别成功";
 
-});
+
+video.currentTime=0;
 
 
+video.play();
+
+
+}
+
+);
+
+
+
+// 丢失暂停
 
 target.addEventListener(
+
 "targetLost",
+
 ()=>{
 
-tip.innerHTML="重新识别";
 
-});
+tip.innerHTML="重新对准";
+
+
+video.pause();
+
+
+}
+
+);
+
+
+
+// 点击屏幕也尝试播放
+
+document.body.addEventListener(
+
+"click",
+
+()=>{
+
+video.play();
+
+}
+
+);
 
 
 </script>
