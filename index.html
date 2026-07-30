@@ -157,11 +157,13 @@ src="#video"
 
 position="0 0 0"
 
-rotation="90 0 0"
+rotation="-90 0 0"
 
-width="11.2"
+scale="1 -1 1"
 
-height="8.4"
+width="22.4"
+
+height="16.8"
 
 >
 
@@ -212,7 +214,7 @@ tip.innerHTML="请对准识别图";
 
 
 
-// 识别成功播放
+// 识别播放
 
 target.addEventListener(
 
@@ -251,13 +253,11 @@ tip.innerHTML="重新对准";
 video.pause();
 
 
-}
-
-);
+});
 
 
 
-// 点击屏幕也尝试播放
+// 点击播放
 
 document.body.addEventListener(
 
@@ -267,12 +267,11 @@ document.body.addEventListener(
 
 video.play();
 
-}
-
-);
+});
 
 
 </script>
+
 
 
 </body>
